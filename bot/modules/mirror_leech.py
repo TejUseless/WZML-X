@@ -59,6 +59,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
                 '-h': '', '-headers': '',
                 '-ss': '0', '-screenshots': '',
                 '-t': '', '-thumb': '',
+                '-rt': False, '--retag': False,
     }
 
     args = arg_parser(input_list[1:], arg_base)
@@ -93,6 +94,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     reply_to      = None
     file_         = None
     session       = ''
+    retag         = args['-rt'] or args['--retag']
     
     if not isinstance(seed, bool):
         dargs = seed.split(':')
@@ -333,7 +335,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             await delete_links(message)
             return
 
-    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, 
+    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, retag
                                     sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link, 
                                     source_url=org_link or link, leech_utils={'screenshots': sshots, 'thumb': thumb})
 
