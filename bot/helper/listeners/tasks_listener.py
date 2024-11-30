@@ -30,6 +30,7 @@ from bot.helper.mirror_utils.status_utils.telegram_status import TelegramStatus
 from bot.helper.mirror_utils.status_utils.ddl_status import DDLStatus
 from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
 from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
+from bot.helper.mirror_utils.status_utils.retag_status import RetagStatus
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.mirror_utils.upload_utils.pyrogramEngine import TgUploader
 from bot.helper.mirror_utils.upload_utils.ddlEngine import DDLUploader
@@ -309,8 +310,32 @@ class MirrorLeechListener:
                 return
             elif not self.seed:
                 await clean_target(dl_path)
-
-        if not self.compress and not self.extract:
+        if self.retag:
+            pswd = self.retag  if isinstance(self.retag,str) else ''
+            if up_path:
+                dl_path = up_path
+            ffmpeg_temp_path = dl_path.replace(".mkv","Demux.mkv")
+            async with download_dict_lock:
+                download_dict[self.uid] = RetagStatus(name, size, gid, self)
+            tester = 'title=LiX MoViEs . CoM'
+            cmd = ['ffmpeg', '-i',dl_path, '-map',
+                    '0:0', '-map', '0:a', 
+                    '-map', '0:s?', '-metadata',tester, 
+                    '-metadata:s:v', tester,'-metadata:s:a', tester,
+                    '-metadata:s:s', tester, '-codec' ,
+                    'copy',ffmpeg_temp_path,'-hide_banner',
+                    '-attach','Lix.png', '-metadata:s:t:0',
+                    'mimetype="image/png"', '-metadata:s:t:0',
+                    'filename="LixMovies.png"']
+            if self.suproc == 'cancelled':
+                return
+            self.suproc = await create_subprocess_exec(*cmd)
+            code = await self.suproc.wait()
+            if code == -9:
+                return
+            elif not self.seed:
+                await clean_target(dl_path)
+        if not self.compress and not self.extract and not self.retag:
             up_path = dl_path
 
         up_dir, up_name = up_path.rsplit('/', 1)
