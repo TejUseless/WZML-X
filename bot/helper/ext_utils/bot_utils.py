@@ -51,6 +51,7 @@ class MirrorStatus:
     STATUS_QUEUEUP     = "QueueUp"
     STATUS_PAUSED      = "Pause"
     STATUS_ARCHIVING   = "Archive"
+    STATUS_RETAGGING   = "ReTag"
     STATUS_EXTRACTING  = "Extract"
     STATUS_SPLITTING   = "Split"
     STATUS_CHECKING    = "CheckUp"
@@ -198,6 +199,7 @@ class EngineStatus:
         self.STATUS_ZIP = f"p7zip v{version_cache['p7zip']}"
         self.STATUS_QUEUE = "Sleep v0"
         self.STATUS_RCLONE = f"RClone {version_cache['rclone']}"
+        self.STATUS_RETAG = "ffmpeg"
 
 
 def get_readable_message():
